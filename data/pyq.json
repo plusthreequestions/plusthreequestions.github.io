@@ -138,7 +138,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-2",
-    "papername": "SEC(Renewable Energy And Energy Harvesting)",
+    "papername": "SEC-Renewable Energy And Energy Harvesting",
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/1_Gp_KkN3fNgTRVdlvSjK-deAVA5MfYL6/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -147,7 +147,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-2",
-    "papername": "SEC(Renewable Energy And Energy Harvesting)",
+    "papername": "SEC-Renewable Energy And Energy Harvesting",
     "year": 2026,
     "drivelink": "https://drive.google.com/file/d/1eiFEcQzjfBwlbrCAQZWY8OFMQEOHX6a0/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -156,7 +156,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-2",
-    "papername": "MDC(Introduction To Web Technologies)",
+    "papername": "MDC-Introduction To Web Technologies",
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/13WqWi-7Vhle1bbzfTU7dPY4K7IbkvxwO/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -165,7 +165,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-2",
-    "papername": "AEC(English)",
+    "papername": "AEC-English",
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/1kE3mg7_Mj3VNgb_rJW5jz5bnDY5NByHT/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -174,7 +174,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-3",
-    "papername": "MDC(Internet And Ethical Practices)",
+    "papername": "MDC-Internet And Ethical Practices",
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/1utEQ2MYO8Jx-mU-zW9nKeTajavF_Cuzc/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -183,7 +183,7 @@
     "university": "Kalahandi/Maa Manikeshwari University",
     "subject": "Other Subjects",
     "semester": "SEM-3",
-    "papername": "VAC(Ethics And Values)",
+    "papername": "VAC-Ethics And Values",
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/1Wi0psvmfLyQQLTzO07Ao2fVQ8SfbA2eO/view?usp=drivesdk",
     "contributedby": "Study With Sanjib"
@@ -223,5 +223,23 @@
     "year": 2025,
     "drivelink": "https://drive.google.com/file/d/13ML1ZiRn7hTA-Dl1CnJuqcwoIIsAW2g_/view?usp=drivesdk",
     "contributedby": "Khirod Sabar"
+  },
+  {
+    "university": "Kalahandi/Maa Manikeshwari University",
+    "subject": "Chemistry",
+    "semester": "SEM-1",
+    "papername": "MAJOR-1(Atomic Structure, Periodicity of Elements and Chemical Bonding)",
+    "year": 2024,
+    "drivelink": "",
+    "contributedby": "Khirod Sabar"
+  },
+  {
+    "university": "Kalahandi/Maa Manikeshwari University",
+    "subject": "Other Subjects",
+    "semester": "SEM-1",
+    "papername": "MDC-Computer Fundamentals",
+    "year": 2024,
+    "drivelink": "",
+    "contributedby": "Study With Sanjib"
   }
 ]
