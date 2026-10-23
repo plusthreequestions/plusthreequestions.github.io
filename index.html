@@ -2395,6 +2395,7 @@
         function populateUniversities() {
             let uniSelect = document.getElementById('uni-select');
             let universities = [...new Set(allData.map(item => item.university))];
+            universities.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
             uniSelect.innerHTML = '<option value="">-- Choose University --</option>';
             universities.forEach(uni => {
                 if(uni) uniSelect.innerHTML += `<option value="${escapeHtml(uni)}">${escapeHtml(uni)}</option>`;
@@ -2414,6 +2415,7 @@
 
             if(uni) {
                 let subjects = [...new Set(allData.filter(item => item.university === uni).map(item => item.subject))];
+                subjects.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
                 subjects.forEach(sub => {
                     if(sub) subSelect.innerHTML += `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`;
                 });
@@ -2459,6 +2461,7 @@
                     item.subject === sub && 
                     item.semester === sem
                 ).map(item => item.papername))];
+                papers.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
 
                 if (papers.filter(Boolean).length === 0) {
                     document.getElementById('pyq-no-data').style.display = 'block';
@@ -2659,7 +2662,7 @@
             const subjects = syllabusData.filter(item =>
                 getSyllabusField(item, ['Category', 'category']) === category &&
                 getSyllabusField(item, ['Paper', 'paper']) === semester
-            );
+            ).sort((x, y) => String(getSyllabusField(x, ['SubjectName', 'Subject Name', 'subjectname', 'subject']) || '').localeCompare(String(getSyllabusField(y, ['SubjectName', 'Subject Name', 'subjectname', 'subject']) || ''), undefined, { numeric: true, sensitivity: 'base' }));
 
             let addedAny = false;
             subjects.forEach(item => {
