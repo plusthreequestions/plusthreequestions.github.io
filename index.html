@@ -2415,7 +2415,13 @@
 
             if(uni) {
                 let subjects = [...new Set(allData.filter(item => item.university === uni).map(item => item.subject))];
-                subjects.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
+                // "Other Subjects" always first, then the rest in A-Z order
+                const isOther = v => String(v).trim().toLowerCase() === 'other subjects';
+                subjects.sort((a, b) => {
+                    if (isOther(a) && !isOther(b)) return -1;
+                    if (!isOther(a) && isOther(b)) return 1;
+                    return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+                });
                 subjects.forEach(sub => {
                     if(sub) subSelect.innerHTML += `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`;
                 });
