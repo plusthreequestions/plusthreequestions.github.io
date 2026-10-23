@@ -1871,6 +1871,7 @@
 
             if (match.type === 'pyq') {
                 switchToTab('download-pyq');
+                _suppressAutoSelect = true;
                 const item = match.data;
                 const uniSelect = document.getElementById('uni-select');
                 uniSelect.value = item.university;
@@ -1883,10 +1884,12 @@
                 loadYears();
                 document.getElementById('year-select').value = item.drivelink;
                 showDownloadLink();
+                _suppressAutoSelect = false;
                 document.getElementById('pyq-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 switchToTab('download-syllabus');
                 fetchSyllabusData().then(() => {
+                    _suppressAutoSelect = true;
                     const item = match.data;
                     document.getElementById('syllabus-category-select').value = item.category;
                     loadSyllabusSemesters();
@@ -1894,6 +1897,7 @@
                     loadSyllabusSubjects();
                     document.getElementById('syllabus-sub-select').value = item.driveLink;
                     showSyllabus();
+                    _suppressAutoSelect = false;
                     document.getElementById('syllabus-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
             }
@@ -2392,14 +2396,33 @@
         }
 
         /* ----- PYQ LOGIC ----- */
+        // Auto-select: if a dropdown has exactly one real option, pick it and
+        // continue to the next step. Paused while a search result is being applied.
+        let _suppressAutoSelect = false;
+        function autoSelectSingle(selectEl, nextStep) {
+            if (_suppressAutoSelect || !selectEl || selectEl.disabled || selectEl.value) return;
+            const realOptions = Array.from(selectEl.options).filter(o => o.value);
+            if (realOptions.length === 1) {
+                selectEl.value = realOptions[0].value;
+                nextStep();
+            }
+        }
+
         function populateUniversities() {
             let uniSelect = document.getElementById('uni-select');
+            const prevUni = uniSelect.value;
             let universities = [...new Set(allData.map(item => item.university))];
             universities.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
             uniSelect.innerHTML = '<option value="">-- Choose University --</option>';
             universities.forEach(uni => {
                 if(uni) uniSelect.innerHTML += `<option value="${escapeHtml(uni)}">${escapeHtml(uni)}</option>`;
             });
+            // Keep an existing choice when the list is refreshed; otherwise auto-pick a single option
+            if (prevUni && universities.includes(prevUni)) {
+                uniSelect.value = prevUni;
+            } else if (!prevUni) {
+                autoSelectSingle(uniSelect, loadSubjects);
+            }
         }
 
         function loadSubjects() {
@@ -2425,6 +2448,7 @@
                 subjects.forEach(sub => {
                     if(sub) subSelect.innerHTML += `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`;
                 });
+                autoSelectSingle(subSelect, loadSemesters);
             }
         }
 
@@ -2445,6 +2469,7 @@
                 semesters.forEach(sem => {
                     if(sem) semSelect.innerHTML += `<option value="${escapeHtml(sem)}">${escapeHtml(sem)}</option>`;
                 });
+                autoSelectSingle(semSelect, loadPapers);
             }
         }
 
@@ -2476,6 +2501,7 @@
                 papers.forEach(p => {
                     if(p) paperSelect.innerHTML += `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`;
                 });
+                autoSelectSingle(paperSelect, loadYears);
             }
         }
 
@@ -2510,12 +2536,14 @@
                 yearData.forEach(item => {
                     yearSelect.innerHTML += `<option value="${escapeHtml(item.drivelink)}">${escapeHtml(item.year)}</option>`;
                 });
+                autoSelectSingle(yearSelect, showDownloadLink);
             }
         }
 
         function resetPyqForm() {
             document.getElementById('uni-select').selectedIndex = 0;
             loadSubjects();
+            autoSelectSingle(document.getElementById('uni-select'), loadSubjects);
         }
 
         // Shared by showDownloadLink() and showSyllabus(): once a result box is
@@ -2624,6 +2652,7 @@
             categories.forEach(category => {
                 categorySelect.innerHTML += `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`;
             });
+            autoSelectSingle(categorySelect, loadSyllabusSemesters);
         }
 
         function loadSyllabusSemesters() {
@@ -2651,6 +2680,7 @@
             semesters.forEach(semester => {
                 semSelect.innerHTML += `<option value="${escapeHtml(semester)}">${escapeHtml(semester)}</option>`;
             });
+            autoSelectSingle(semSelect, loadSyllabusSubjects);
         }
 
         function loadSyllabusSubjects() {
@@ -2684,6 +2714,8 @@
                 }
             });
 
+            autoSelectSingle(subSelect, showSyllabus);
+
             if (!addedAny) {
                 document.getElementById('syllabus-no-data').style.display = 'block';
             }
@@ -2692,6 +2724,7 @@
         function resetSyllabusForm() {
             document.getElementById('syllabus-category-select').selectedIndex = 0;
             loadSyllabusSemesters();
+            autoSelectSingle(document.getElementById('syllabus-category-select'), loadSyllabusSemesters);
         }
 
         function showSyllabus() {
