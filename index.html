@@ -2433,6 +2433,7 @@
 
             if(sub) {
                 let semesters = [...new Set(allData.filter(item => item.university === uni && item.subject === sub).map(item => item.semester))];
+                semesters.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
                 semesters.forEach(sem => {
                     if(sem) semSelect.innerHTML += `<option value="${escapeHtml(sem)}">${escapeHtml(sem)}</option>`;
                 });
