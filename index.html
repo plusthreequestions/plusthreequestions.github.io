@@ -2646,6 +2646,7 @@
                     .map(item => getSyllabusField(item, ['Paper', 'paper']))
                     .filter(Boolean)
             )];
+            semesters.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }));
 
             semesters.forEach(semester => {
                 semSelect.innerHTML += `<option value="${escapeHtml(semester)}">${escapeHtml(semester)}</option>`;
