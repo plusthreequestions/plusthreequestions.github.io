@@ -2216,7 +2216,7 @@
             if (!forceRefresh) {
                 const cached = getCache('pyq-data');
                 if (cached) {
-                    allData = cached;
+                    allData = normalizePyqData(cached);
                     populateUniversities();
                     loading.style.display = 'none';
                     formContent.style.display = 'block';
@@ -2233,7 +2233,7 @@
                 // param just makes sure a forced refresh actually reaches the origin.
                 let response = await fetchWithTimeout(PYQ_URL + '?v=' + Date.now(), FETCH_TIMEOUT_MS);
                 if (!response.ok) throw new Error('Network response was not ok');
-                allData = await response.json();
+                allData = normalizePyqData(await response.json());
                 setCache('pyq-data', allData);
                 populateUniversities();
                 loading.style.display = 'none';
@@ -2245,7 +2245,7 @@
                 // stale, rather than blocking the student with a hard error screen.
                 const stale = getStaleCache('pyq-data');
                 if (stale && stale.length) {
-                    allData = stale;
+                    allData = normalizePyqData(stale);
                     populateUniversities();
                     loading.style.display = 'none';
                     formContent.style.display = 'block';
@@ -2279,7 +2279,7 @@
             if (!forceRefresh) {
                 const cached = getCache('syllabus-data');
                 if (cached) {
-                    syllabusData = cached;
+                    syllabusData = normalizeSyllabusData(cached);
                     populateSyllabus();
                     isSyllabusLoaded = true;
                     loading.style.display = 'none';
@@ -2294,7 +2294,7 @@
             try {
                 let syllabusResponse = await fetchWithTimeout(SYLLABUS_URL + '?v=' + Date.now(), FETCH_TIMEOUT_MS);
                 if (!syllabusResponse.ok) throw new Error('Network response was not ok');
-                syllabusData = await syllabusResponse.json();
+                syllabusData = normalizeSyllabusData(await syllabusResponse.json());
                 setCache('syllabus-data', syllabusData);
                 populateSyllabus();
                 isSyllabusLoaded = true;
@@ -2305,7 +2305,7 @@
 
                 const stale = getStaleCache('syllabus-data');
                 if (stale && stale.length) {
-                    syllabusData = stale;
+                    syllabusData = normalizeSyllabusData(stale);
                     populateSyllabus();
                     isSyllabusLoaded = true;
                     loading.style.display = 'none';
@@ -2327,6 +2327,69 @@
             
         
         
+
+        /* ----- DATA CLEANUP (runs once, right after data is loaded) -----
+           Sheet entries often differ only by stray spaces or letter case
+           ("Chemistry", "chemistry ", " CHEMISTRY"). Without this, each variant
+           showed up as a separate dropdown option and search missed some rows.
+           Rule: values are compared ignoring case and extra spaces; all variants
+           of the same value are replaced by the most common spelling found in
+           the sheet, so the dropdown shows it once. DriveLink / contributor are
+           only trimmed (never case-changed - links are case-sensitive). */
+        function cleanText(v) {
+            return String(v === undefined || v === null ? '' : v).replace(/\s+/g, ' ').trim();
+        }
+
+        function normalizeRows(rows, groupedFields, trimOnlyFields) {
+            if (!Array.isArray(rows)) return rows;
+            const counts = {};   // field -> key -> { variant: count }
+            rows.forEach(item => {
+                if (!item || typeof item !== 'object') return;
+                groupedFields.forEach(f => {
+                    if (item[f] === undefined || item[f] === null) return;
+                    const clean = cleanText(item[f]);
+                    if (!clean) return;
+                    const key = clean.toLowerCase();
+                    counts[f] = counts[f] || {};
+                    counts[f][key] = counts[f][key] || {};
+                    counts[f][key][clean] = (counts[f][key][clean] || 0) + 1;
+                });
+            });
+            const canonical = {};
+            Object.keys(counts).forEach(f => {
+                canonical[f] = {};
+                Object.keys(counts[f]).forEach(key => {
+                    const variants = counts[f][key];
+                    canonical[f][key] = Object.keys(variants).sort((a, b) => variants[b] - variants[a])[0];
+                });
+            });
+            return rows.map(item => {
+                if (!item || typeof item !== 'object') return item;
+                const out = Object.assign({}, item);
+                groupedFields.forEach(f => {
+                    if (out[f] === undefined || out[f] === null) return;
+                    const clean = cleanText(out[f]);
+                    out[f] = clean ? canonical[f][clean.toLowerCase()] : '';
+                });
+                trimOnlyFields.forEach(f => {
+                    if (out[f] === undefined || out[f] === null) return;
+                    out[f] = String(out[f]).trim();
+                });
+                return out;
+            });
+        }
+
+        function normalizePyqData(rows) {
+            return normalizeRows(rows,
+                ['university', 'subject', 'semester', 'papername', 'year'],
+                ['drivelink', 'contributedby']);
+        }
+
+        function normalizeSyllabusData(rows) {
+            return normalizeRows(rows,
+                ['Category', 'category', 'Paper', 'paper', 'SubjectName', 'Subject Name', 'subjectname', 'subject'],
+                ['DriveLink', 'Drive Link', 'drivelink']);
+        }
 
         /* ----- PYQ LOGIC ----- */
         function populateUniversities() {
